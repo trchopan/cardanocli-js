@@ -28,7 +28,7 @@ describe('Basics & Utilities', () => {
         
         expect(Object.keys(obj).length).toEqual(17);
     
-        expect(obj.hasOwnProperty('poolDeposit')).toBeTruthy();
+        expect(obj.hasOwnProperty('stakePoolDeposit')).toBeTruthy();
         expect(obj.hasOwnProperty('protocolVersion')).toBeTruthy();
         expect(obj.hasOwnProperty('minUTxOValue')).toBeTruthy();
         expect(obj.hasOwnProperty('decentralisationParam')).toBeTruthy();
