@@ -32,13 +32,18 @@ const registerPool = (pool, wallet, data) => {
     wallet.name,
     poolId
   );
+
   let stakePoolDeposit = cardanocliJs.queryProtocolParameters().stakePoolDeposit;
+  let balance = wallet.balance();
   let tx = {
-    txIn: wallet.balance().utxo,
+    txIn: balance.utxo,
     txOut: [
-      {
+      { 
         address: wallet.paymentAddr,
-        value: { lovelace: wallet.balance().value.lovelace - stakePoolDeposit },
+        value: {
+          ...balance.value,
+          lovelace: balance.value.lovelace - stakePoolDeposit,
+        } 
       },
     ],
     witnessCount: 3,
