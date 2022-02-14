@@ -31,14 +31,17 @@ const registerWallet = (wallet) => {
   let stakeAddressDeposit = cardanocliJs.queryProtocolParameters().stakeAddressDeposit;
   let stakeCert = cardanocliJs.stakeAddressRegistrationCertificate(account);
   let paymentAddress = cardanocliJs.wallet(account).paymentAddr;
-  let balance = cardanocliJs.wallet(account).balance().value.lovelace;
-  if (balance < stakeAddressDeposit) {
-    throw new Error("The wallet balance needs to be higher than stakeAddressDeposit");
-  }
+  let balance = cardanocliJs.wallet(account).balance().value;
   let tx = {
     txIn: cardanocliJs.queryUtxo(paymentAddress),
     txOut: [
-      { address: paymentAddress, value: { lovelace: balance - stakeAddressDeposit } },
+      { 
+        address: paymentAddress,
+        value: {
+          ...balance,
+          lovelace: balance.lovelace - stakeAddressDeposit,
+        } 
+      },
     ],
     certs: [{ cert: stakeCert }],
     witnessCount: 2,
