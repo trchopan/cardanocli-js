@@ -175,6 +175,7 @@ declare namespace CardanocliJs {
   export interface Pool {
     name: string,
     id: string,
+    pool?: {cert: string};
     node?: Node;
     kes?:  Keys;
     vrf?:  Keys;
