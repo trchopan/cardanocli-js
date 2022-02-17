@@ -3,6 +3,7 @@
 export class CardanocliJs {
   constructor(options: CardanocliJs.ConstructorOptions);
 
+  currentEpoch(): number;
   queryProtocolParameters(): any;
   queryTip(): CardanocliJs.QueryTip;
   queryStakeAddressInfo(address: string): CardanocliJs.StakeAddressInfo[];
