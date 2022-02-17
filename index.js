@@ -155,6 +155,14 @@ class CardanocliJs {
   }
 
   /**
+   * @returns {number}
+   */
+  currentEpoch() {
+    const {systemStart, epochLength} = this.shelleyGenesis;
+    return (Date.now() - new Date(systemStart).getTime()) / 1000 / epochLength;
+  }
+
+  /**
    * @returns {object}
    */
   queryProtocolParameters() {
