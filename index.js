@@ -1047,7 +1047,7 @@ class CardanocliJs {
                 --tx-body-file ${options.txBody} \
                 --tx-in-count ${options.txIn.length} \
                 --tx-out-count ${options.txOut.length} \
-                --mainnet \
+                --${this.network} \
                 --witness-count ${options.witnessCount} \
                 --protocol-params-file ${this.protocolParametersPath}`)
         .toString()
@@ -1143,6 +1143,7 @@ class CardanocliJs {
    *
    * @param {Object} options
    * @param {path} options.txBody
+   * @param {path} options.scriptFile
    * @param {path} options.signingKey
    * @returns {path}
    */
@@ -1158,11 +1159,21 @@ class CardanocliJs {
       return response.then((res) => res.text());
     }
     const UID = Math.random().toString(36).substr(2, 9);
+    if (!options.signingKey && !options.scriptFile) {
+      throw new Error("script-file or signing-key required for transaction witness command");
+    }
+    let signingParams = "";
+    if (options.scriptFile) {
+      signingParams += "--script-file ${options.scriptFile} ";
+    }
+    if (options.signingKey) {
+      signingParams += "--signing-key-file ${options.signingKey}";
+    }
     execSync(`${this.cliPath} transaction witness \
         --tx-body-file ${options.txBody} \
         --${this.network} \
-        --signing-key-file ${options.signingKey} \
-        --out-file ${this.dir}/tmp/tx_${UID}.witness`);
+        --out-file ${this.dir}/tmp/tx_${UID}.witness \
+        ${signingParams}`);
     return `${this.dir}/tmp/tx_${UID}.witness`;
   }
 
@@ -1204,7 +1215,8 @@ class CardanocliJs {
     return parseInt(
       execSync(`${this.cliPath} transaction calculate-min-required-utxo \
                 --tx-out ${multiAsset} \
-                --protocol-params-file ${this.protocolParametersPath}`)
+                --protocol-params-file ${this.protocolParametersPath} \
+                --babbage-era`)
         .toString()
         .replace(/\s+/g, " ")
         .split(" ")[1]
