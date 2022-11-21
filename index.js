@@ -106,6 +106,7 @@ class CardanocliJs {
   /**
    *
    * @param {Object} options
+   * @param {path=} options.protocolParametersPath
    * @param {path=} options.shelleyGenesisPath
    * @param {path=} options.socketPath - Default: Env Variable
    * @param {path=} options.cliPath - Default: Env Variable
@@ -122,6 +123,7 @@ class CardanocliJs {
     this.cliPath = "cardano-cli";
 
     if (options) {
+      options.protocolParametersPath && (this.protocolParametersPath = options.protocolParametersPath)
       options.shelleyGenesisPath &&
         (this.shelleyGenesis = JSON.parse(
           execSync(`cat ${options.shelleyGenesisPath}`).toString()
@@ -166,6 +168,10 @@ class CardanocliJs {
    * @returns {object}
    */
   queryProtocolParameters() {
+    if (this.protocolParametersPath) {
+        return JSON.parse(String(fs.readdirSync(this.protocolParametersPath)))
+    }
+
     if (this.httpProvider) {
       let response = fetch(`${this.httpProvider}/queryProtocolParameters`);
       if (typeof window === "undefined") {
@@ -455,14 +461,16 @@ class CardanocliJs {
         .readFileSync(
           `${this.dir}/priv/wallet/${account}/${account}.payment.addr`
         )
-        .toString();
+        .toString()
+        .trim();
     });
     fileException(() => {
       stakingAddr = fs
         .readFileSync(
           `${this.dir}/priv/wallet/${account}/${account}.stake.addr`
         )
-        .toString();
+        .toString()
+        .trim();
     });
 
     let files = fs.readdirSync(`${this.dir}/priv/wallet/${account}`);
@@ -1041,7 +1049,7 @@ class CardanocliJs {
       });
       return response.then((res) => res.text());
     }
-    this.queryProtocolParameters();
+    if (!this.protocolParametersPath) this.queryProtocolParameters();
     return parseInt(
       execSync(`${this.cliPath} transaction calculate-min-fee \
                 --tx-body-file ${options.txBody} \
